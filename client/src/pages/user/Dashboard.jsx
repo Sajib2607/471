@@ -1,0 +1,121 @@
+import React, { useEffect, useState } from 'react'
+import { assets } from '../../assets/assets'
+import { useAppContext } from '../../context/AppContext'
+import toast from 'react-hot-toast'
+
+const Dashboard = () => {
+  const [dashboardData, setDashboardData] = useState({
+    totalDrafts: 0,
+    pendingReviews: 0,
+    approvedBlogs: 0,
+    recentDrafts: []
+  })
+
+  const { axios } = useAppContext()
+
+  const fetchDashboard = async () => {
+    try {
+      const { data } = await axios.get('/api/user/drafts')
+      if (data.success) {
+        const drafts = data.drafts
+        const pendingReviews = drafts.filter(draft => draft.reviewStatus === 'pending')
+        const approvedBlogs = drafts.filter(draft => draft.reviewStatus === 'approved')
+        
+        setDashboardData({
+          totalDrafts: drafts.length,
+          pendingReviews: pendingReviews.length,
+          approvedBlogs: approvedBlogs.length,
+          recentDrafts: drafts.slice(0, 5)
+        })
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
+  useEffect(() => {
+    fetchDashboard()
+  }, [])
+
+  return (
+    <div className='flex-1 p-4 md:p-10 bg-blue-50/50'>
+      <div className='flex flex-wrap gap-4'>
+        <div className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow'>
+          <img src={assets.dashboard_icon_3} alt="" />
+          <div>
+            <p className='text-xl font-semibold text-gray-600'>{dashboardData.totalDrafts}</p>
+            <p className='text-gray-400 font-light'>Total Drafts</p>
+          </div>
+        </div>
+
+        <div className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow'>
+          <img src={assets.dashboard_icon_2} alt="" />
+          <div>
+            <p className='text-xl font-semibold text-gray-600'>{dashboardData.pendingReviews}</p>
+            <p className='text-gray-400 font-light'>Pending Reviews</p>
+          </div>
+        </div>
+
+        <div className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow'>
+          <img src={assets.dashboard_icon_1} alt="" />
+          <div>
+            <p className='text-xl font-semibold text-gray-600'>{dashboardData.approvedBlogs}</p>
+            <p className='text-gray-400 font-light'>Approved Blogs</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div className='flex items-center gap-3 m-4 mt-6 text-gray-600'>
+          <img src={assets.dashboard_icon_4} alt="" />
+          <p>Recent Drafts</p>
+        </div>
+
+        <div className='relative max-w-4xl overflow-x-auto shadow rounded-lg scrollbar-hide bg-white'>
+          <table className='w-full text-sm text-gray-500'>
+            <thead className='text-xs text-gray-600 text-left uppercase'>
+              <tr>
+                <th scope='col' className='px-2 py-4 xl:px-6'> # </th>
+                <th scope='col' className='px-2 py-4'> Blog Title </th>
+                <th scope='col' className='px-2 py-4 max-sm:hidden'> Date </th>
+                <th scope='col' className='px-2 py-4 max-sm:hidden'> Status </th>
+                <th scope='col' className='px-2 py-4'> Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {dashboardData.recentDrafts.map((draft, index) => (
+                <tr key={draft._id} className='border-b border-gray-200'>
+                  <td className='px-2 py-4 xl:px-6'>{index + 1}</td>
+                  <td className='px-2 py-4'>{draft.title}</td>
+                  <td className='px-2 py-4 max-sm:hidden'>
+                    {new Date(draft.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className='px-2 py-4 max-sm:hidden'>
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      draft.reviewStatus === 'pending' 
+                        ? 'bg-yellow-100 text-yellow-800' 
+                        : draft.reviewStatus === 'approved'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {draft.reviewStatus}
+                    </span>
+                  </td>
+                  <td className='px-2 py-4'>
+                    <button className='text-primary hover:underline text-xs'>
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default Dashboard 
