@@ -6,7 +6,6 @@ import toast from 'react-hot-toast'
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState({
     totalDrafts: 0,
-    pendingReviews: 0,
     approvedBlogs: 0,
     recentDrafts: []
   })
@@ -24,12 +23,10 @@ const Dashboard = () => {
       if (!approvedRes.data.success) return toast.error(approvedRes.data.message)
 
       const drafts = draftsRes.data.drafts
-      const pendingReviews = drafts.filter(draft => draft.reviewStatus === 'pending')
       const approvedCount = approvedRes.data.blogs?.length || 0
 
       setDashboardData({
         totalDrafts: drafts.length,
-        pendingReviews: pendingReviews.length,
         approvedBlogs: approvedCount,
         recentDrafts: drafts.slice(0, 5)
       })
@@ -53,13 +50,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow'>
-          <img src={assets.dashboard_icon_2} alt="" />
-          <div>
-            <p className='text-xl font-semibold text-gray-600'>{dashboardData.pendingReviews}</p>
-            <p className='text-gray-400 font-light'>Pending Reviews</p>
-          </div>
-        </div>
+        
 
         <div onClick={() => navigate('/user/approved')} className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow cursor-pointer hover:shadow-md transition-shadow'>
           <img src={assets.dashboard_icon_1} alt="" />
@@ -83,7 +74,7 @@ const Dashboard = () => {
                 <th scope='col' className='px-2 py-4 xl:px-6'> # </th>
                 <th scope='col' className='px-2 py-4'> Blog Title </th>
                 <th scope='col' className='px-2 py-4 max-sm:hidden'> Date </th>
-                <th scope='col' className='px-2 py-4 max-sm:hidden'> Status </th>
+                
                 <th scope='col' className='px-2 py-4'> Actions</th>
               </tr>
             </thead>
@@ -95,17 +86,7 @@ const Dashboard = () => {
                   <td className='px-2 py-4 max-sm:hidden'>
                     {new Date(draft.createdAt).toLocaleDateString()}
                   </td>
-                  <td className='px-2 py-4 max-sm:hidden'>
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      draft.reviewStatus === 'pending' 
-                        ? 'bg-yellow-100 text-yellow-800' 
-                        : draft.reviewStatus === 'approved'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {draft.reviewStatus}
-                    </span>
-                  </td>
+                  
                   <td className='px-2 py-4'>
                     <button className='text-primary hover:underline text-xs'>
                       Edit

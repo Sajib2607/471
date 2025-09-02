@@ -7,7 +7,8 @@ import Dashboard from './pages/admin/Dashboard'
 import AddBlog from './pages/admin/AddBlog'
 import ListBlog from './pages/admin/ListBlog'
 import Drafts from './pages/admin/Drafts'
-import PendingReviews from './pages/admin/PendingReviews'
+// import PendingReviews from './pages/admin/PendingReviews'
+import Advertise from './pages/admin/Advertise'
 import Comments from './pages/admin/Comments'
 import Login from './components/admin/Login'
 import UserLayout from './pages/user/Layout'
@@ -39,7 +40,7 @@ const App = () => {
           <Route path='addBlog' element={<AddBlog/>}/>
           <Route path='listBlog' element={<ListBlog/>}/>
           <Route path='drafts' element={<Drafts/>}/>
-          <Route path='pending-reviews' element={<PendingReviews/>}/>
+          <Route path='advertise' element={<Advertise/>}/>
           <Route path='comments' element={<Comments/>}/>
         </Route>
 

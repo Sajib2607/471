@@ -10,6 +10,7 @@ import {
 } from '../controllers/userController.js';
 import upload from '../middleware/multer.js';
 import auth from '../middleware/auth.js';
+import { getLatestAdvert } from '../controllers/blogController.js';
 
 const userRouter = express.Router();
 
@@ -20,5 +21,6 @@ userRouter.put('/profile', upload.single('profileImage'), auth, updateUserProfil
 userRouter.get('/drafts', auth, getUserDrafts);
 userRouter.post('/submit-review', auth, submitBlogForReview);
 userRouter.get('/approved', auth, getUserApprovedBlogs);
+userRouter.get('/advert/latest', getLatestAdvert);
 
 export default userRouter; 

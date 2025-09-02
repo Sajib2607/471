@@ -2,6 +2,7 @@ import fs from 'fs';
 import imagekit from '../configs/imageKIt.js';
 import Blog from '../models/Blog.js';
 import Comment from '../models/Comment.js'; // <-- Added import
+import Advert from '../models/Advert.js';
 import main from '../configs/gemini.js';
 
 
@@ -269,6 +270,15 @@ export const updateBlog = async (req, res) => {
     const message = isAdmin ? "Blog updated successfully" : "Blog updated. Submit for review when ready.";
     res.json({ success: true, message });
 
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
+export const getLatestAdvert = async (req, res) => {
+  try {
+    const advert = await Advert.findOne({}).sort({ createdAt: -1 });
+    res.json({ success: true, advert });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
