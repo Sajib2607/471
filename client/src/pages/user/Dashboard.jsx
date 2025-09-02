@@ -43,7 +43,9 @@ const Dashboard = () => {
     <div className='flex-1 p-4 md:p-10 bg-blue-50/50'>
       <div className='flex flex-wrap gap-4'>
         <div className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow'>
-          <img src={assets.dashboard_icon_3} alt="" />
+          <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
+            <img src={assets.dashboard_icon_3} alt="" className='w-5 h-5' />
+          </div>
           <div>
             <p className='text-xl font-semibold text-gray-600'>{dashboardData.totalDrafts}</p>
             <p className='text-gray-400 font-light'>Total Drafts</p>
@@ -53,7 +55,9 @@ const Dashboard = () => {
         
 
         <div onClick={() => navigate('/user/approved')} className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow cursor-pointer hover:shadow-md transition-shadow'>
-          <img src={assets.dashboard_icon_1} alt="" />
+          <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
+            <img src={assets.dashboard_icon_1} alt="" className='w-5 h-5' />
+          </div>
           <div>
             <p className='text-xl font-semibold text-gray-600'>{dashboardData.approvedBlogs}</p>
             <p className='text-gray-400 font-light'>Approved Blogs</p>

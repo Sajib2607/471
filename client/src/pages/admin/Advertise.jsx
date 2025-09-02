@@ -6,6 +6,7 @@ const Advertise = () => {
   const { axios } = useAppContext()
   const [heading, setHeading] = useState('')
   const [imageFile, setImageFile] = useState(null)
+  const [dragActive, setDragActive] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [adverts, setAdverts] = useState([])
   const [editingId, setEditingId] = useState(null)
@@ -111,7 +112,21 @@ const Advertise = () => {
           </div>
           <div>
             <label className='block text-sm text-gray-600 mb-1'>Image</label>
-            <input type='file' accept='image/*' onChange={(e) => setImageFile(e.target.files[0])} />
+            <div
+              className={`border-2 border-dashed rounded p-4 text-center cursor-pointer ${dragActive ? 'border-primary bg-primary/5' : 'border-gray-300'}`}
+              onDragOver={(e) => { e.preventDefault(); setDragActive(true) }}
+              onDragLeave={() => setDragActive(false)}
+              onDrop={(e) => { e.preventDefault(); setDragActive(false); if (e.dataTransfer.files?.[0]) setImageFile(e.dataTransfer.files[0]) }}
+              onClick={() => document.getElementById('advert-image-input').click()}
+            >
+              <p className='text-sm text-gray-500'>Drag & drop an image here, or <span className='text-primary underline'>browse</span></p>
+              {imageFile && (
+                <div className='mt-3 flex items-center justify-center'>
+                  <img src={URL.createObjectURL(imageFile)} alt='preview' className='h-24 rounded shadow' />
+                </div>
+              )}
+            </div>
+            <input id='advert-image-input' type='file' accept='image/*' className='hidden' onChange={(e) => setImageFile(e.target.files[0])} />
           </div>
           <button
             type='submit'

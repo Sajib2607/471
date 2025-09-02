@@ -37,7 +37,9 @@ const Dashboard = () => {
       <div className='flex flex-wrap gap-4'>
         
         <div className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow cursor-pointer hover:scale-105 transition-all'>
-          <img src={assets.dashboard_icon_1} alt="" />
+          <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
+            <img src={assets.dashboard_icon_1} alt="" className='w-5 h-5' />
+          </div>
           <div>
             <p className='text-xl font-semibold ext-gray-600'>{dashboardData.blogs}</p>
             <p className='text-gray-400 font-light'>Blogs</p>
@@ -45,7 +47,9 @@ const Dashboard = () => {
         </div>
 
         <div className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow cursor-pointer hover:scale-105 transition-all'>
-          <img src={assets.dashboard_icon_2} alt="" />
+          <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
+            <img src={assets.dashboard_icon_2} alt="" className='w-5 h-5' />
+          </div>
           <div>
             <p className='text-xl font-semibold ext-gray-600'>{dashboardData.comments}</p>
             <p className='text-gray-400 font-light'>Comments</p>
@@ -57,7 +61,9 @@ const Dashboard = () => {
           onClick={() => navigate('/admin/drafts')}
           className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow cursor-pointer hover:scale-105 transition-all'
         >
-          <img src={assets.dashboard_icon_3} alt="" />
+          <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
+            <img src={assets.dashboard_icon_3} alt="" className='w-5 h-5' />
+          </div>
           <div>
             <p className='text-xl font-semibold ext-gray-600'>{dashboardData.drafts}</p>
             <p className='text-gray-400 font-light'>Drafts</p>
@@ -67,7 +73,9 @@ const Dashboard = () => {
         
 
         <div className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow cursor-pointer hover:scale-105 transition-all'>
-          <img src={assets.user_icon} alt="" />
+          <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
+            <img src={assets.user_icon} alt="" className='w-5 h-5' />
+          </div>
           <div>
             <p className='text-xl font-semibold ext-gray-600'>{dashboardData.totalUsers}</p>
             <p className='text-gray-400 font-light'>Total Users</p>
