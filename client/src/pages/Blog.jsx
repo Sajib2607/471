@@ -16,6 +16,9 @@ const Blog = () => {
   const [comments, setComments] = useState([])
   const [name, setName] = useState('')
   const [content, setContent] = useState('')
+  const [rating, setRating] = useState(0)
+  const [avgRating, setAvgRating] = useState(0)
+  const [ratingCount, setRatingCount] = useState(0)
 
   const fetchBlogData = async () => {
     try {
@@ -37,6 +40,13 @@ const Blog = () => {
     } catch (error) {
       toast.error(error.message)
     }
+  }
+
+  const fetchRating = async () => {
+    try {
+      const { data } = await axios.get(`/api/blog/rating/${id}`)
+      if (data.success) { setAvgRating(data.average); setRatingCount(data.count) }
+    } catch (error) {}
   }
 
   const addComment = async (e) => {
@@ -63,6 +73,7 @@ const Blog = () => {
   useEffect(() => {
     fetchBlogData()
     fetchComments()
+    fetchRating()
     // Polling mechanism to auto-refresh comments every 5 seconds
     const interval = setInterval(fetchComments, 5000)
     return () => clearInterval(interval)
@@ -96,7 +107,7 @@ const Blog = () => {
         </h1>
         <h2 className="my-5 max-w-lg truncate mx-auto">{data.subTitle} </h2>
         <p className="inline-block py-1 px-4 rounded-full mb-6 border text-sm border-primary/35 bg-primary/5 font-medium text-primary">
-          David Beckham
+          
         </p>
       </div>
 
@@ -160,6 +171,33 @@ const Blog = () => {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* RATING SECTION */}
+      <div className="mt-4 mb-12 max-w-5xl mx-auto px-5">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-2">
+            {[1,2,3,4,5].map((star) => (
+              <button
+                key={star}
+                aria-label={`Rate ${star}`}
+                onClick={async () => {
+                  try {
+                    setRating(star)
+                    const { data } = await axios.post('/api/blog/rating', { blogId: id, value: star })
+                    if (data.success) { setAvgRating(data.average); setRatingCount(data.count) }
+                  } catch (e) {}
+                }}
+                className="text-2xl"
+              >
+                <span className={star <= rating ? 'text-yellow-400' : 'text-gray-300'}>★</span>
+              </button>
+            ))}
+          </div>
+          <div className="text-sm text-gray-600">
+            Average: {avgRating.toFixed(1)} ({ratingCount})
+          </div>
         </div>
       </div>
       <Footer />

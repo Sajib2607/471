@@ -2,6 +2,9 @@ import fs from 'fs';
 import imagekit from '../configs/imageKIt.js';
 import Blog from '../models/Blog.js';
 import Comment from '../models/Comment.js'; // <-- Added import
+import Advert from '../models/Advert.js';
+import Rating from '../models/Rating.js';
+import mongoose from 'mongoose';
 import main from '../configs/gemini.js';
 
 
@@ -269,6 +272,48 @@ export const updateBlog = async (req, res) => {
     const message = isAdmin ? "Blog updated successfully" : "Blog updated. Submit for review when ready.";
     res.json({ success: true, message });
 
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
+export const getLatestAdvert = async (req, res) => {
+  try {
+    const advert = await Advert.findOne({}).sort({ createdAt: -1 });
+    res.json({ success: true, advert });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
+export const addRating = async (req, res) => {
+  try {
+    const { blogId, value } = req.body;
+    if (!blogId || !value) return res.json({ success: false, message: 'Missing fields' });
+    if (value < 1 || value > 5) return res.json({ success: false, message: 'Invalid rating' });
+    await Rating.create({ blog: blogId, value });
+    const avgAgg = await Rating.aggregate([
+      { $match: { blog: new mongoose.Types.ObjectId(blogId) } },
+      { $group: { _id: '$blog', avg: { $avg: '$value' }, count: { $sum: 1 } } }
+    ]);
+    const avg = avgAgg[0]?.avg || 0;
+    const count = avgAgg[0]?.count || 0;
+    res.json({ success: true, message: 'Thanks for rating', average: avg, count });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
+export const getRating = async (req, res) => {
+  try {
+    const { blogId } = req.params;
+    const avgAgg = await Rating.aggregate([
+      { $match: { blog: new mongoose.Types.ObjectId(blogId) } },
+      { $group: { _id: '$blog', avg: { $avg: '$value' }, count: { $sum: 1 } } }
+    ]);
+    const avg = avgAgg[0]?.avg || 0;
+    const count = avgAgg[0]?.count || 0;
+    res.json({ success: true, average: avg, count });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }

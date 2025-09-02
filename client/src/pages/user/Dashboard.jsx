@@ -6,30 +6,30 @@ import toast from 'react-hot-toast'
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState({
     totalDrafts: 0,
-    pendingReviews: 0,
     approvedBlogs: 0,
     recentDrafts: []
   })
 
-  const { axios } = useAppContext()
+  const { axios, navigate } = useAppContext()
 
   const fetchDashboard = async () => {
     try {
-      const { data } = await axios.get('/api/user/drafts')
-      if (data.success) {
-        const drafts = data.drafts
-        const pendingReviews = drafts.filter(draft => draft.reviewStatus === 'pending')
-        const approvedBlogs = drafts.filter(draft => draft.reviewStatus === 'approved')
-        
-        setDashboardData({
-          totalDrafts: drafts.length,
-          pendingReviews: pendingReviews.length,
-          approvedBlogs: approvedBlogs.length,
-          recentDrafts: drafts.slice(0, 5)
-        })
-      } else {
-        toast.error(data.message)
-      }
+      const [draftsRes, approvedRes] = await Promise.all([
+        axios.get('/api/user/drafts'),
+        axios.get('/api/user/approved')
+      ])
+
+      if (!draftsRes.data.success) return toast.error(draftsRes.data.message)
+      if (!approvedRes.data.success) return toast.error(approvedRes.data.message)
+
+      const drafts = draftsRes.data.drafts
+      const approvedCount = approvedRes.data.blogs?.length || 0
+
+      setDashboardData({
+        totalDrafts: drafts.length,
+        approvedBlogs: approvedCount,
+        recentDrafts: drafts.slice(0, 5)
+      })
     } catch (error) {
       toast.error(error.message)
     }
@@ -43,23 +43,21 @@ const Dashboard = () => {
     <div className='flex-1 p-4 md:p-10 bg-blue-50/50'>
       <div className='flex flex-wrap gap-4'>
         <div className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow'>
-          <img src={assets.dashboard_icon_3} alt="" />
+          <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
+            <img src={assets.dashboard_icon_3} alt="" className='w-5 h-5' />
+          </div>
           <div>
             <p className='text-xl font-semibold text-gray-600'>{dashboardData.totalDrafts}</p>
             <p className='text-gray-400 font-light'>Total Drafts</p>
           </div>
         </div>
 
-        <div className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow'>
-          <img src={assets.dashboard_icon_2} alt="" />
-          <div>
-            <p className='text-xl font-semibold text-gray-600'>{dashboardData.pendingReviews}</p>
-            <p className='text-gray-400 font-light'>Pending Reviews</p>
-          </div>
-        </div>
+        
 
-        <div className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow'>
-          <img src={assets.dashboard_icon_1} alt="" />
+        <div onClick={() => navigate('/user/approved')} className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow cursor-pointer hover:shadow-md transition-shadow'>
+          <div className='w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center'>
+            <img src={assets.dashboard_icon_1} alt="" className='w-5 h-5' />
+          </div>
           <div>
             <p className='text-xl font-semibold text-gray-600'>{dashboardData.approvedBlogs}</p>
             <p className='text-gray-400 font-light'>Approved Blogs</p>
@@ -80,7 +78,7 @@ const Dashboard = () => {
                 <th scope='col' className='px-2 py-4 xl:px-6'> # </th>
                 <th scope='col' className='px-2 py-4'> Blog Title </th>
                 <th scope='col' className='px-2 py-4 max-sm:hidden'> Date </th>
-                <th scope='col' className='px-2 py-4 max-sm:hidden'> Status </th>
+                
                 <th scope='col' className='px-2 py-4'> Actions</th>
               </tr>
             </thead>
@@ -92,17 +90,7 @@ const Dashboard = () => {
                   <td className='px-2 py-4 max-sm:hidden'>
                     {new Date(draft.createdAt).toLocaleDateString()}
                   </td>
-                  <td className='px-2 py-4 max-sm:hidden'>
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      draft.reviewStatus === 'pending' 
-                        ? 'bg-yellow-100 text-yellow-800' 
-                        : draft.reviewStatus === 'approved'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {draft.reviewStatus}
-                    </span>
-                  </td>
+                  
                   <td className='px-2 py-4'>
                     <button className='text-primary hover:underline text-xs'>
                       Edit

@@ -40,6 +40,7 @@ export const AppProvider = ({children})=>{
         fetchBlogs();
         const storedToken = localStorage.getItem('token')
         if (storedToken){
+            axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
             setToken(storedToken);
         }
     },[])

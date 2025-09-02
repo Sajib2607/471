@@ -1,7 +1,10 @@
 import jwt from 'jsonwebtoken';
+import fs from 'fs';
+import imagekit from '../configs/imageKIt.js';
 import Blog from '../models/Blog.js';
 import Comment from '../models/Comment.js';
 import User from '../models/User.js';
+import Advert from '../models/Advert.js';
 import nodemailer from 'nodemailer'; 
 
 
@@ -58,17 +61,7 @@ export const getAllBlogsAdmin = async (req, res) => {
     }
 };
 
-export const getPendingReviews = async (req, res) => {
-    try {
-        const pendingBlogs = await Blog.find({ 
-            reviewStatus: 'pending',
-            isReviewed: true 
-        }).populate('author', 'name email').sort({ createdAt: -1 });
-        res.json({ success: true, pendingBlogs });
-    } catch (error) {
-        res.json({ success: false, message: error.message });
-    }
-};
+// Pending reviews removed per new requirements
 
 export const getDashboard = async (req, res) => {
     try {
@@ -76,7 +69,6 @@ export const getDashboard = async (req, res) => {
         const blogs = await Blog.countDocuments();
         const comments = await Comment.countDocuments();
         const drafts = await Blog.countDocuments({ isPublished: false });
-        const pendingReviews = await Blog.countDocuments({ reviewStatus: 'pending', isReviewed: true });
         const totalUsers = await User.countDocuments();
 
         res.json({
@@ -85,7 +77,6 @@ export const getDashboard = async (req, res) => {
                 blogs,
                 comments,
                 drafts,
-                pendingReviews,
                 totalUsers,
                 recentBlogs
             }
@@ -141,3 +132,89 @@ export const getAllUsers = async (req, res) => {
         res.json({ success: false, message: error.message });
     }
 };         
+
+export const createAdvert = async (req, res) => {
+    try {
+        const { heading } = req.body;
+        const imageFile = req.file;
+        if (!heading || !imageFile) {
+            return res.json({ success: false, message: 'Heading and image are required' });
+        }
+
+        const fileBuffer = fs.readFileSync(imageFile.path);
+        const response = await imagekit.upload({
+            file: fileBuffer,
+            fileName: imageFile.originalname,
+            folder: '/adverts'
+        });
+
+        const optimizedImageUrl = imagekit.url({
+            path: response.filePath,
+            transformation: [
+                { quality: 'auto' },
+                { format: 'webp' },
+                { width: '1280' }
+            ]
+        });
+
+        const advert = await Advert.create({ heading, image: optimizedImageUrl });
+        res.json({ success: true, advert, message: 'Advertisement created successfully' });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+};
+
+export const listAdverts = async (req, res) => {
+    try {
+        const adverts = await Advert.find({}).sort({ createdAt: -1 });
+        res.json({ success: true, adverts });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+};
+
+export const updateAdvert = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { heading } = req.body;
+        const imageFile = req.file;
+
+        const updateData = {};
+        if (heading) updateData.heading = heading;
+
+        if (imageFile) {
+            const fileBuffer = fs.readFileSync(imageFile.path);
+            const response = await imagekit.upload({
+                file: fileBuffer,
+                fileName: imageFile.originalname,
+                folder: '/adverts'
+            });
+            const optimizedImageUrl = imagekit.url({
+                path: response.filePath,
+                transformation: [
+                    { quality: 'auto' },
+                    { format: 'webp' },
+                    { width: '1280' }
+                ]
+            });
+            updateData.image = optimizedImageUrl;
+        }
+
+        const advert = await Advert.findByIdAndUpdate(id, updateData, { new: true });
+        if (!advert) return res.json({ success: false, message: 'Advertisement not found' });
+        res.json({ success: true, advert, message: 'Advertisement updated successfully' });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+};
+
+export const deleteAdvert = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const advert = await Advert.findByIdAndDelete(id);
+        if (!advert) return res.json({ success: false, message: 'Advertisement not found' });
+        res.json({ success: true, message: 'Advertisement deleted successfully' });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+};
