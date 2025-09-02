@@ -129,6 +129,20 @@ export const getUserDrafts = async (req, res) => {
     }
 };
 
+export const getUserApprovedBlogs = async (req, res) => {
+    try {
+        const blogs = await Blog.find({
+            author: req.user.userId,
+            reviewStatus: 'approved',
+            isPublished: true
+        }).sort({ createdAt: -1 });
+
+        res.json({ success: true, blogs });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+};
+
 export const submitBlogForReview = async (req, res) => {
     try {
         const { blogId } = req.body;

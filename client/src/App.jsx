@@ -15,6 +15,7 @@ import UserDashboard from './pages/user/Dashboard'
 import UserAddBlog from './pages/user/AddBlog'
 import UserDrafts from './pages/user/Drafts'
 import UserProfile from './pages/user/Profile'
+import UserApproved from './pages/user/Approved'
 import 'quill/dist/quill.snow.css'
 import {Toaster} from 'react-hot-toast'
 import { useAppContext } from './context/AppContext'
@@ -47,6 +48,7 @@ const App = () => {
           <Route index element={<UserDashboard/>}/>
           <Route path='addBlog' element={<UserAddBlog/>}/>
           <Route path='drafts' element={<UserDrafts/>}/>
+          <Route path='approved' element={<UserApproved/>}/>
           <Route path='profile' element={<UserProfile/>}/>
         </Route>
       </Routes>

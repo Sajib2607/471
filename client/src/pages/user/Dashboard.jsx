@@ -11,25 +11,28 @@ const Dashboard = () => {
     recentDrafts: []
   })
 
-  const { axios } = useAppContext()
+  const { axios, navigate } = useAppContext()
 
   const fetchDashboard = async () => {
     try {
-      const { data } = await axios.get('/api/user/drafts')
-      if (data.success) {
-        const drafts = data.drafts
-        const pendingReviews = drafts.filter(draft => draft.reviewStatus === 'pending')
-        const approvedBlogs = drafts.filter(draft => draft.reviewStatus === 'approved')
-        
-        setDashboardData({
-          totalDrafts: drafts.length,
-          pendingReviews: pendingReviews.length,
-          approvedBlogs: approvedBlogs.length,
-          recentDrafts: drafts.slice(0, 5)
-        })
-      } else {
-        toast.error(data.message)
-      }
+      const [draftsRes, approvedRes] = await Promise.all([
+        axios.get('/api/user/drafts'),
+        axios.get('/api/user/approved')
+      ])
+
+      if (!draftsRes.data.success) return toast.error(draftsRes.data.message)
+      if (!approvedRes.data.success) return toast.error(approvedRes.data.message)
+
+      const drafts = draftsRes.data.drafts
+      const pendingReviews = drafts.filter(draft => draft.reviewStatus === 'pending')
+      const approvedCount = approvedRes.data.blogs?.length || 0
+
+      setDashboardData({
+        totalDrafts: drafts.length,
+        pendingReviews: pendingReviews.length,
+        approvedBlogs: approvedCount,
+        recentDrafts: drafts.slice(0, 5)
+      })
     } catch (error) {
       toast.error(error.message)
     }
@@ -58,7 +61,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow'>
+        <div onClick={() => navigate('/user/approved')} className='flex items-center gap-4 bg-white p-4 min-w-58 rounded shadow cursor-pointer hover:shadow-md transition-shadow'>
           <img src={assets.dashboard_icon_1} alt="" />
           <div>
             <p className='text-xl font-semibold text-gray-600'>{dashboardData.approvedBlogs}</p>

@@ -5,7 +5,8 @@ import {
   getUserProfile, 
   updateUserProfile,
   getUserDrafts,
-  submitBlogForReview
+  submitBlogForReview,
+  getUserApprovedBlogs
 } from '../controllers/userController.js';
 import upload from '../middleware/multer.js';
 import auth from '../middleware/auth.js';
@@ -18,5 +19,6 @@ userRouter.get('/profile', auth, getUserProfile);
 userRouter.put('/profile', upload.single('profileImage'), auth, updateUserProfile);
 userRouter.get('/drafts', auth, getUserDrafts);
 userRouter.post('/submit-review', auth, submitBlogForReview);
+userRouter.get('/approved', auth, getUserApprovedBlogs);
 
 export default userRouter; 
