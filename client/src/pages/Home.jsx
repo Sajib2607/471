@@ -8,6 +8,7 @@ import { useAppContext } from '../context/AppContext'
 const Home = () => {
   const { axios } = useAppContext()
   const [advert, setAdvert] = useState(null)
+  const [totalBlogs, setTotalBlogs] = useState(0)
 
   useEffect(() => {
     const fetchAdvert = async () => {
@@ -37,6 +38,19 @@ const Home = () => {
           </a>
         </div>
       )}
+      
+      {/* Blog Count Section */}
+      <div className='max-w-5xl mx-auto px-4 mb-8'>
+        <div className='bg-white rounded-lg shadow p-6 text-center'>
+          <h1 className='text-3xl md:text-4xl font-semibold text-gray-800 mb-4'>Welcome to Our Blog</h1>
+          <p className='text-lg text-gray-600 mb-6'>Discover amazing stories and insights</p>
+          <div className='bg-gray-100 rounded-lg p-4 inline-block'>
+            <div className='text-4xl md:text-5xl font-bold text-gray-800 mb-2'>{totalBlogs}</div>
+            <div className='text-lg text-gray-600'>Total Articles</div>
+          </div>
+        </div>
+      </div>
+      
       <BlogList/>
       <Newsletter/>
       <Footer/>
